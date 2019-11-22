@@ -1,9 +1,8 @@
 import numpy as np
+import pickle
 
 """
 TODO:
-- save and load method
-- examples and tests
 - parallel?
 - LR scheduling
 """
@@ -213,9 +212,11 @@ class ESOpt:
     steps : int - number of optimization steps already performed
 
     Methods:
-    Constructor(params, opt, eval, samples, std, evalTest) -> object instance
-    optimize(n) -> (score, gradnorm)
-    optimize_ranked(n) -> (score, gradnorm)
+    Constructor(self, params, opt, eval, samples, std, evalTest) -> object instance
+    optimize(self, n) -> (score, gradnorm)
+    optimize_ranked(self, n) -> (score, gradnorm)
+    save(self, file)
+    load(file) -> object
     """
     
     #SHARED ATTRIBUTES
@@ -309,12 +310,38 @@ class ESOpt:
         else: score = self.eval(self.params, 999999999)
         return (score, np.linalg.norm(grad))
     #}
+    
+    #save the current optimizer to a file (without evaluator!)
+    def save(self, file):
+        with open(file, "wb") as f:
+            data = [self.params, self.opt, self.samples, self.std, self.steps]
+            pickle.dump(data, f)
+        #}
+    #}
+    
+    #load optimizer from file (without evaluator!)
+    def load(file):
+        obj = ESOpt()
+        with open(file, "rb") as f:
+            params, opt, samples, std, steps = pickle.load(f)
+            obj.params = params
+            obj.opt = opt
+            obj.samples = samples
+            obj.std = std
+            obj.steps = steps
+        #}
+        return obj
+    #}
 #}
 
 
 if __name__ == "__main__":
     #test
     opt = ESOpt([0], RAdam(), lambda x,y: 0)
+    opt.optimize(1)
+    opt.save("test.opt")
+    opt = ESOpt.load("test.opt")
+    opt.eval = lambda x,y: 0
     opt.optimize(1)
 #}
 
