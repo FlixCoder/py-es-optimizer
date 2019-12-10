@@ -1,22 +1,22 @@
 import numpy as np
-import esopt
+from esopt_second_order import ESOpt
 
 
 def main():
     params = np.array([0.0, 0.0, 0.0])
-    optimizer = esopt.RAdam(0.5, beta1=0, beta2=0) #plain SGD/SGA
-    opt = esopt.ESOpt(params, optimizer, evalTrain, samples = 25, std = 0.02)
+    opt = ESOpt(params, evalTrain, lr=0.5, samples = 25, std = 0.02)
 
     print("Beginning:")
     print("Initial Score: {}".format(evalTrain(params, 0)))
     for i in range(10):
-        score, gradnorm = opt.optimize(10)
+        score = opt.optimize(10)
         print("{:2d}: {}".format(i+1, score))
     #}
     print("Finished!")
     print(opt.params)
 #}
 
+#evaluation of three parameters w0, w1, w2 to fit the function f(x) = x^2 = w0 + w1*x + w2*x^2
 def evalTrain(params, t):
     X = np.array([0.0, 1.0, 2.0, -1, 4])
     Y = np.array([0.0, 1.0, 4.0, 1, 16])

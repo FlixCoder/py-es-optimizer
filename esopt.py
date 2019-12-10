@@ -9,6 +9,7 @@ TODO:
 
 
 """ Rectified Adam optimizer """
+#becomes SGD with beta2 = 0
 class RAdam:
     """
     Attributes:
