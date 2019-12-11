@@ -73,7 +73,7 @@ class ESOpt:
             1. use second as "approximation" of the Hessian, i.e. only the diagonal values were calculated
             2. the inversion of the diagonal hessian is all its elements inverted, stored in a vector
             3. to avoid saddle-points, convert second to the absolute values
-            4. make sure, the second is not too close to zero (divide by min(second) and possibly scale by tanh(max(grad)))
+            4. make sure, second is not too close to zero (divide by min(second) and scale by tanh(thresh+max(grad)))
             5. the update step delta now computes as element-wise delta = grad / second
             6. here for ascend: new params = old params + lr * delta, so update step is dampened by step size lr
     """
@@ -102,8 +102,7 @@ class ESOpt:
             second /= (self.samples * self.std * self.std) #divide by h^2 also (on average)
             #compute delta update using a modified Newton's optimizer
             second = np.abs(second)
-            #second = second / np.min(second)
-            second = np.tanh(0.5+np.max(np.abs(grad))) * second / np.min(second)
+            second = np.tanh(0.5 + np.max(np.abs(grad))) * second / np.min(second)
             delta = np.divide(grad, second)
             #take parameter step
             self.params += self.lr * delta
