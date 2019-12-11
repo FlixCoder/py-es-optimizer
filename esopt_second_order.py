@@ -101,7 +101,7 @@ class ESOpt:
             grad /= (self.samples * 2 * self.std) #divide by 2h also (on average)
             second /= (self.samples * self.std * self.std) #divide by h^2 also (on average)
             #compute delta update using a modified Newton's optimizer
-            second = np.abs(second)
+            second = np.abs(second) + 1e-8 #avoid divide by zero
             second = np.tanh(0.5 + np.max(np.abs(grad))) * second / np.min(second)
             delta = np.divide(grad, second)
             #take parameter step
